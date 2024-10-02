@@ -1,0 +1,21 @@
+# Исключить CMake файлы сборки
+/build/
+CMakeCache.txt
+CMakeFiles/
+
+# Исключить сгенерированные бинарные файлы
+*.o
+*.obj
+*.so
+*.a
+*.exe
+*.dll
+
+# Исключить временные файлы системы
+*.log
+*.tmp
+*.swp
+
+# Исключить настройки IDE (например, CLion, Visual Studio Code)
+.idea/
+.vscode/
