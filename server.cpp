@@ -83,3 +83,8 @@ void Server::removeSession(const shared_ptr<Session>& session)
 {
     sessions_.erase(session);
 }
+
+void handleMessageFromTo()
+{
+    
+}

@@ -1,28 +1,28 @@
-#ifndef DATABASE_H
-#define DATABASE_H
+// #ifndef DATABASE_H
+// #define DATABASE_H
 
-#include <libpq-fe.h>
-#include <string>
-#include <unordered_set>
-#include <iostream>
-#include <stdexcept>
+// #include <libpq-fe.h>
+// #include <string>
+// #include <unordered_set>
+// #include <iostream>
+// #include <stdexcept>
 
-using namespace std;
+// using namespace std;
 
-class Database {
-public:
+// class Database {
+// public:
 
-    static Database& instance();
+//     static Database& instance();
 
-    void connect();
-    void disconnect();
+//     void connect();
+//     void disconnect();
 
-    string selectUserDataBySessinId(const string& sessionId);
+//     string selectUserDataBySessinId(const string& sessionId);
 
-private:
-    Database() : conn(nullptr) {}
-    ~Database() { disconnect(); }
-    PGconn* conn;
-};
+// private:
+//     Database() : conn(nullptr) {}
+//     ~Database() { disconnect(); }
+//     PGconn* conn;
+// };
 
-#endif // DATABASE_H
+// #endif // DATABASE_H

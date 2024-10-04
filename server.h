@@ -25,6 +25,7 @@ public:
     void removeSession(const shared_ptr<Session>& session);
 
 private:
+    void handleMessageFromTo();
     void do_accept();
 
     tcp::acceptor acceptor_;

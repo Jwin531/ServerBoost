@@ -24,6 +24,7 @@ public:
     void do_read_login();
     void sendMessageToAll(const string& message, std::shared_ptr<Session> newSession);
     void onUserConnected(const std::string& newLogin, std::shared_ptr<Session> newSession);
+    void handleMessage(const string& message);
 
 private:
     void do_read();
