@@ -12,12 +12,40 @@ using json = nlohmann::json;
 using namespace std;
 
 Session::Session(shared_ptr<tcp::socket> socket, Server& server)
-    : socket_(move(socket)), server_(server) {}
+    : socket_(move(socket)), server_(server), sessionLogin("") {}
 
 void Session::start() {
     cout << "Сессия началась для клиента." << endl;
     do_read();
 }
+
+// Session::~Session()
+// {
+     // try 
+    //  {
+    //     // 1. Закрытие сокета
+    //     if (socket_->is_open()) {
+    //         socket_->close();
+    //     }
+        
+    //     // 2. Удаление сессии из сервера
+    //     server_.removeSession(shared_from_this());
+
+    //     // 3. Оповещение остальных пользователей
+    //     json notification;
+    //     notification["type"] = "user_disconnected";
+    //     notification["login"] = sessionLogin;  // Предположим, что есть поле с логином пользователя
+
+    //     std::string notificationMessage = notification.dump();
+    //     sendMessageToAll(notificationMessage, shared_from_this());
+
+    //     cout << "Сессия завершена для пользователя: " << sessionLogin << endl;
+    // } 
+    // catch (const std::exception& e) 
+    // {
+    //     cerr << "Ошибка при завершении сессии: " << e.what() << endl;
+    // }
+// }
 
 void Session::do_read() 
 {
@@ -91,6 +119,7 @@ void Session::do_read_login() {
                     {
                         server_.save_session_to_redis(login_message["login"],createUniqueSessionId());
                         onUserConnected(login_message["login"],self);
+                        sessionLogin = login_message["login"];
                         do_read();
                     }
                     else 

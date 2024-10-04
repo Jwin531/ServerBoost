@@ -18,6 +18,7 @@ class Server;
 class Session : public enable_shared_from_this<Session> {
 public:
     explicit Session(shared_ptr<tcp::socket> socket, Server& server);
+    // ~Session();
 
     void start();
     void do_read_login();
@@ -32,6 +33,7 @@ private:
     shared_ptr<tcp::socket> socket_;
     boost::asio::streambuf buffer_;
     Server& server_; 
+    string sessionLogin;
 };
 
 #endif // SESSION_H

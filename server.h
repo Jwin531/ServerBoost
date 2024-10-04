@@ -22,6 +22,7 @@ public:
     void save_session_to_redis(const string& login, const string& uniqueSessionId);
     vector<std::string> getActiveLogins(const string& currentLogin);
     set<shared_ptr<Session>> getAllSessions(){return sessions_;}
+    void removeSession(const shared_ptr<Session>& session);
 
 private:
     void do_accept();

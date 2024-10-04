@@ -2,6 +2,8 @@
 #include "session.h"
 #include <iostream>
 #include <memory>
+#include <ctime>
+#include <chrono>
 
 using boost::asio::ip::tcp;
 using namespace std;
@@ -29,9 +31,23 @@ void Server::do_accept() {
         });
 }
 
-void Server::save_session_to_redis(const string& login, const string& uniqueSessionId) 
+void Server::save_session_to_redis(const std::string& login, const std::string& uniqueSessionId) 
 {
-    redis_->hset("sessions", login, uniqueSessionId);
+    // Текущее время в формате ISO 8601
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_time_t = std::chrono::system_clock::to_time_t(now);
+    std::string last_active_time = std::ctime(&now_time_t);  // Преобразуем в строку
+
+    // Сохранение информации о сессии в виде хэша
+    redis_->hset("sessions:" + login, "sessionId", uniqueSessionId);
+    redis_->hset("sessions:" + login, "status", "online");
+    redis_->hset("sessions:" + login, "last_active_time", last_active_time);
+
+    // Установка TTL (например, 5 минут)
+    redis_->expire("sessions:" + login, 300); // 300 секунд (5 минут)
+
+    // Добавление в множество активных пользователей
+    redis_->sadd("active_users", login);
 }
 
 vector<std::string> Server::getActiveLogins(const string& currentLogin)
@@ -39,7 +55,7 @@ vector<std::string> Server::getActiveLogins(const string& currentLogin)
     vector<string> logins;
     try
     {
-        redis_->hkeys("sessions", back_inserter(logins));
+        redis_->smembers("active_users", back_inserter(logins));
 
         logins.erase(
             remove_if(logins.begin(),logins.end(),
@@ -61,4 +77,9 @@ vector<std::string> Server::getActiveLogins(const string& currentLogin)
         cerr << e.what() << '\n';
     }
     return logins;
+}
+
+void Server::removeSession(const shared_ptr<Session>& session)
+{
+    sessions_.erase(session);
 }
