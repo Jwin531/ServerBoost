@@ -97,7 +97,7 @@ void Session::handleMessage(const string& message)
             string textMessage = json_message["message"];
 
             // Отправка сообщения получателю
-            // server_.sendMessageToUser(receiver, sender, textMessage);
+            server_.sendMessageToUser(receiver, sender, textMessage);
         }
         else 
         {
@@ -119,6 +119,22 @@ void Session::do_write(const string& message)
 
     boost::asio::async_write(*socket_, boost::asio::buffer(json_data),
         [this, self, json_data](const boost::system::error_code& ec, size_t /*length*/) 
+        {
+            if (ec) {
+                cerr << "Ошибка отправки сообщения клиенту: " << ec.message() << endl;
+            } else {
+                cout << "Сообщение отправлено клиенту: " << json_data << endl;
+            }
+        });
+}
+
+void Session::sendMessageToReceiver(shared_ptr<tcp::socket> socket, const string& message)
+{
+    json json_message = {{"response", message}};
+    string json_data = json_message.dump() + "\n";
+
+    boost::asio::async_write(*socket, boost::asio::buffer(json_data),
+        [this, json_data](const boost::system::error_code& ec, size_t /*length*/) 
         {
             if (ec) {
                 cerr << "Ошибка отправки сообщения клиенту: " << ec.message() << endl;
@@ -168,6 +184,7 @@ void Session::do_read_login() {
                         string user_channel = "user_" + sessionLogin + "_channel";
                         onUserConnected(login_message["login"],self);
                         sessionLogin = login_message["login"];
+                        server_.setSessionsByLogin(sessionLogin, socket_);
                         do_read();
                     }
                     else 

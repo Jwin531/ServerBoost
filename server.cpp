@@ -4,6 +4,7 @@
 #include <memory>
 #include <ctime>
 #include <chrono>
+#include <algorithm>
 
 using boost::asio::ip::tcp;
 using namespace std;
@@ -16,7 +17,6 @@ Server::Server(boost::asio::io_context& io_context, short port): acceptor_(io_co
 
 void Server::do_accept() {
 
-    
     acceptor_.async_accept(
         [this](boost::system::error_code ec, tcp::socket socket) {
             if (!ec) {
@@ -84,7 +84,25 @@ void Server::removeSession(const shared_ptr<Session>& session)
     sessions_.erase(session);
 }
 
-void handleMessageFromTo()
+void Server::sendMessageToUser(const string& receiverLogin, const string& senderLogin, const string& textMessage) 
 {
-    
+    for (const auto& session : sessions_) 
+    {
+        if (session->getSessionLogin() == receiverLogin) // Предполагается, что вы добавили метод getLogin() в класс Session
+        {
+            json response;
+            response["type"] = "message";
+            response["sender"] = senderLogin;
+            response["message"] = textMessage;
+            
+            cout << "Cообщение отправится: " << receiverLogin << endl;
+            auto socket = getSocket(receiverLogin);
+
+            if (socket) // Проверка на существование сокета
+            {
+                session->sendMessageToReceiver(socket, response.dump()); // Отправляем сообщение пользователю
+            }
+            break; // Выходим из цикла, так как сообщение отправлено
+        }
+    }
 }

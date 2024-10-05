@@ -7,7 +7,7 @@ int main() {
     try {
         io_context.run();
     } catch (const std::runtime_error& e) {
-        std::cerr << e.what() << std::endl; // Обработка ошибки подключения
+        std::cerr << "Ошибка запуска сервера: " << e.what() << std::endl; // Улучшенная обработка ошибки
         return 1;
     }
 

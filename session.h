@@ -25,11 +25,13 @@ public:
     void sendMessageToAll(const string& message, std::shared_ptr<Session> newSession);
     void onUserConnected(const std::string& newLogin, std::shared_ptr<Session> newSession);
     void handleMessage(const string& message);
+    string getSessionLogin(){return sessionLogin;}
+    void sendMessageToReceiver(shared_ptr<tcp::socket> socket, const string& message);
 
 private:
+    void do_write(const string& message);
     void do_read();
 
-    void do_write(const string& message);
 
     shared_ptr<tcp::socket> socket_;
     boost::asio::streambuf buffer_;
