@@ -18,7 +18,7 @@ class Server;
 class Session : public enable_shared_from_this<Session> {
 public:
     explicit Session(shared_ptr<tcp::socket> socket, Server& server);
-    // ~Session();
+    ~Session();
 
     void start();
     void do_read_login();
@@ -27,6 +27,7 @@ public:
     void handleMessage(const string& message);
     string getSessionLogin(){return sessionLogin;}
     void sendMessageToReceiver(shared_ptr<tcp::socket> socket, const string& message);
+    void closeSession();
 
 private:
     void do_write(const string& message);

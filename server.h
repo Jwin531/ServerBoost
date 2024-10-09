@@ -27,6 +27,7 @@ public:
     void sendMessageToUser(const string& receiverLogin, const string& senderLogin, const string& textMessage);
     void setSessionsByLogin(const string& login, shared_ptr<tcp::socket> socket){sessionsByLogin_[login] = socket;}
     shared_ptr<tcp::socket> getSocket(const string& login){return sessionsByLogin_[login];}
+    void removeUserFromMap(const string& login){sessionsByLogin_.erase(login); redis_->srem("active_users",login); redis_->del("sessions:"+login);}
 
 private:
     void handleMessageFromTo();

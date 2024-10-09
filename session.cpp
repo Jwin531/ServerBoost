@@ -19,33 +19,42 @@ void Session::start()
     do_read();
 }
 
-// Session::~Session()
-// {
-     // try 
-    //  {
-    //     // 1. Закрытие сокета
-    //     if (socket_->is_open()) {
-    //         socket_->close();
-    //     }
-        
-    //     // 2. Удаление сессии из сервера
-    //     server_.removeSession(shared_from_this());
+Session::~Session()
+{
+    try 
+    {
+        // Закрытие сокета
+        if (socket_->is_open()) {
+            socket_->close();
+            
+        }
 
-    //     // 3. Оповещение остальных пользователей
-    //     json notification;
-    //     notification["type"] = "user_disconnected";
-    //     notification["login"] = sessionLogin;  // Предположим, что есть поле с логином пользователя
+        cout << "Сессия завершена для пользователя: " << sessionLogin << endl;
+    } 
+    catch (const std::exception& e) 
+    {
+        cerr << "Ошибка при завершении сессии: " << e.what() << endl;
+    }
+}
 
-    //     std::string notificationMessage = notification.dump();
-    //     sendMessageToAll(notificationMessage, shared_from_this());
+void Session::closeSession() {
+    try {
+        // Оповещение остальных пользователей
+        json notification;
+        notification["type"] = "user_disconnected";
+        notification["login"] = sessionLogin;
+        string notificationMessage = notification.dump();
+        sendMessageToAll(notificationMessage, shared_from_this());
 
-    //     cout << "Сессия завершена для пользователя: " << sessionLogin << endl;
-    // } 
-    // catch (const std::exception& e) 
-    // {
-    //     cerr << "Ошибка при завершении сессии: " << e.what() << endl;
-    // }
-// }
+        // Удаление сессии из сервера
+        server_.removeSession(shared_from_this());
+        server_.removeUserFromMap(sessionLogin);
+    } 
+    catch (const std::exception& e) 
+    {
+        cerr << "Ошибка при закрытии сессии: " << e.what() << endl;
+    }
+}
 
 void Session::do_read() 
 {
@@ -78,6 +87,7 @@ void Session::do_read()
             else
             {
                 cerr << "Ошибка чтения данных: " << ec.message() << endl;
+                closeSession();
             }
         });
 }
