@@ -19,7 +19,7 @@ class Session : public enable_shared_from_this<Session> {
 public:
     explicit Session(shared_ptr<tcp::socket> socket, Server& server);
     ~Session();
-
+    
     void start();
     void do_read_login();
     void sendMessageToAll(const string& message, std::shared_ptr<Session> newSession);

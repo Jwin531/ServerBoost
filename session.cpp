@@ -1,5 +1,6 @@
 #include "session.h"
 #include "server.h"
+#include "database.h"
 #include <iostream>
 #include <utility>
 #include <boost/uuid/uuid.hpp>
@@ -108,6 +109,8 @@ void Session::handleMessage(const string& message)
 
             // Отправка сообщения получателю
             server_.sendMessageToUser(receiver, sender, textMessage);
+            Database& db = Database::instance();
+            db.saveMessage(textMessage,receiver,sender,json_message["timestamp"]);
         }
         else 
         {

@@ -1,5 +1,6 @@
 #include "server.h"
 #include "session.h"
+#include "database.h"
 #include <iostream>
 #include <memory>
 #include <ctime>
