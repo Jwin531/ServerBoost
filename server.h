@@ -34,7 +34,7 @@ public:
     void removeSession(const shared_ptr<Session>& session);
 
     // Отправка сообщения конкретному пользователю
-    void sendMessageToUser(const string& receiverLogin, const string& senderLogin, const string& textMessage);
+    void sendMessageToUser(const string& receiverLogin, const string& senderLogin, const string& textMessage, bool status);
 
     // Привязка логина пользователя к его сокету
     void setSessionsByLogin(const string& login, shared_ptr<tcp::socket> socket){sessionsByLogin_[login] = socket;}
@@ -44,6 +44,9 @@ public:
 
     // Удаление пользователя из активных сессий и Redis
     void removeUserFromMap(const string& login){sessionsByLogin_.erase(login); redis_->srem("active_users",login); redis_->del("sessions:"+login);}
+
+    // Получить все активные логины
+    unordered_set<string> getActiveLoginsFromRedis();
 
 private:
     // Обработка передачи сообщений между пользователями

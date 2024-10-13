@@ -1,6 +1,6 @@
 #include "server.h"
 #include "session.h"
-#include "database.h"
+// #include "database.h"
 #include <iostream>
 #include <memory>
 #include <ctime>
@@ -85,16 +85,17 @@ void Server::removeSession(const shared_ptr<Session>& session)
     sessions_.erase(session);
 }
 
-void Server::sendMessageToUser(const string& receiverLogin, const string& senderLogin, const string& textMessage) 
+void Server::sendMessageToUser(const string& receiverLogin, const string& senderLogin, const string& textMessage, bool status) 
 {
     for (const auto& session : sessions_) 
     {
-        if (session->getSessionLogin() == receiverLogin) // Предполагается, что вы добавили метод getLogin() в класс Session
+        if (session->getSessionLogin() == receiverLogin) 
         {
             json response;
             response["type"] = "message";
             response["sender"] = senderLogin;
             response["message"] = textMessage;
+            response["status"] = status;
             
             cout << "Cообщение отправится: " << receiverLogin << endl;
             auto socket = getSocket(receiverLogin);
@@ -106,4 +107,11 @@ void Server::sendMessageToUser(const string& receiverLogin, const string& sender
             break; // Выходим из цикла, так как сообщение отправлено
         }
     }
+}
+
+unordered_set<string> Server::getActiveLoginsFromRedis()
+{
+    unordered_set<std::string> active_users;
+    redis_->smembers("active_users", inserter(active_users,active_users.begin()));
+    return active_users;
 }

@@ -16,7 +16,8 @@ public:
 
     void connect();
     void disconnect();
-    void saveMessage(const string& message, const string& receiver, const string& sender, const string& time);
+    void saveMessage(const string& message, const string& receiver, const string& sender, const string& time, bool status);
+    string selectChatWith(const string& login);
 
 private:
     Database() : conn(nullptr) {}

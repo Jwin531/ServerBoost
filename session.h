@@ -30,6 +30,7 @@ public:
     void closeSession();
 
 private:
+    bool isOnline(const string& receiverLogin);
     void do_write(const string& message);
     void do_read();
 

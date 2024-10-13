@@ -27,7 +27,7 @@ Session::~Session()
         // Закрытие сокета
         if (socket_->is_open()) {
             socket_->close();
-            
+
         }
 
         cout << "Сессия завершена для пользователя: " << sessionLogin << endl;
@@ -93,6 +93,24 @@ void Session::do_read()
         });
 }
 
+bool chatWith(const string& receiverLogin, const string& senderLogin)
+{
+    string chatLogin = Database::instance().selectChatWith(receiverLogin);  
+    if(senderLogin == chatLogin)
+    {
+        return true;
+    }
+    return false;
+}
+
+bool Session::isOnline(const std::string& receiverLogin)
+{
+    const auto& logins = server_.getActiveLoginsFromRedis();
+
+    return logins.find(receiverLogin) != logins.end();
+}
+
+
 void Session::handleMessage(const string& message)
 {
     try 
@@ -108,9 +126,25 @@ void Session::handleMessage(const string& message)
             string textMessage = json_message["message"];
 
             // Отправка сообщения получателю
-            server_.sendMessageToUser(receiver, sender, textMessage);
             Database& db = Database::instance();
-            db.saveMessage(textMessage,receiver,sender,json_message["timestamp"]);
+            if(chatWith(receiver,sender)) // Если получатель находится в диалоге с отправителем
+            {
+                db.saveMessage(textMessage,receiver,sender,json_message["timestamp"],true); // true
+                server_.sendMessageToUser(receiver, sender, textMessage,true);
+                cout << "Я в тру";
+            }
+            else if(isOnline(receiver)) // Если получатель не в сети
+            {
+                db.saveMessage(textMessage,receiver,sender,json_message["timestamp"],false); // false
+                server_.sendMessageToUser(receiver, sender, textMessage,false);
+                cout << "Я в 1 фолс";
+            }
+            else
+            {
+                db.saveMessage(textMessage,receiver,sender,json_message["timestamp"], false);  //false
+                server_.sendMessageToUser(receiver, sender, textMessage,false);
+                cout << "Я во 2 фолс";
+            }
         }
         else 
         {
